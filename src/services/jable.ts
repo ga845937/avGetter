@@ -53,7 +53,7 @@ export class Jable {
             await jable.page.goto(jable.avUrl);
             const bnameDom = await jable.page.title();
             if (jable.listDownload) {
-                jable.bname = bnameDom.split("出演的AV在線看")[0];
+                jable.bname = bnameDom.split("出演的AV在線看")[0].replace(/([<>:"/\\|?*])/g, "");
 
                 const [videoLength] = await jable.page.$$eval(".inactive-color ", anchors => anchors.map(a => parseInt(a.textContent.replace(" 部影片", ""))));
                 const videoPage = Array.from({ length: Math.ceil(videoLength / 24) }, (num, i) => (i + 1).toString().padStart(2, "0"));
@@ -70,7 +70,7 @@ export class Jable {
                 }
             }
             else {
-                jable.bname = bnameDom.split(" - Jable.TV")[0];
+                jable.bname = bnameDom.split(" - Jable.TV")[0].replace(/([<>:"/\\|?*])/g, "");
                 jable.chList = [[jable.bname, jable.avUrl]];
             }
 
@@ -96,7 +96,7 @@ export class Jable {
 
             for (const chapterIndex of chioceChapterIndex) {
                 const chapterName = jable.chList[chapterIndex][0];
-                const tsPath = join(config.rootDir, jable.bname, chapterName);
+                const tsPath = join(config.rootDir, jable.bname, chapterName.split(" ")[0]);
                 const finalName = join(config.rootDir, jable.bname, `${chapterName}.mp4`);
                 if (existsSync(tsPath) || existsSync(finalName)) {
                     this.socket.emit("status", `${jable.bname} - ${chapterName} 已存在`);
